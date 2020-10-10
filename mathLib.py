@@ -10,6 +10,10 @@ def sumVectors(vec1, vec2):
     return sumList
 
 def subVectors(vec1, vec2):
+    # if len(vec1) == 0:
+    #     vec1 = [1, 1, 1]
+    # if len(vec2) == 0:
+    #     vec2 = [1, 1, 1]
     subList = []
     subList.extend((vec1[0] - vec2[0], vec1[1] - vec2[1], vec1[2] - vec2[2]))
     return subList
@@ -20,6 +24,12 @@ def mulVectors(vec1, vec2):
     return mulList
 
 def dotVectors(v0, v1):
+    # if len(v0) == 0:
+    #     v0 = [1, 1, 1]
+    #     # return ((v1[0]) + (v1[1]) + (v1[2]))
+    # if len(v1) == 0:
+    #     v1 = [1, 1, 1]
+    
     return ((v0[0] * v1[0]) + (v0[1] * v1[1]) + (v0[2] * v1[2]))
     
 # Producto cruz entre dos vectores
