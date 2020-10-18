@@ -129,16 +129,18 @@ def inverse(a):
         ret.append(tmp[i][len(tmp[i])//2:])
     return ret
 
-def baryCoords(Ax, Bx, Cx, Ay, By, Cy, Px, Py):
-    try:
-        u = ( ((By - Cy)*(Px - Cx) + (Cx - Bx)*(Py - Cy) ) /
-              ((By - Cy)*(Ax - Cx) + (Cx - Bx)*(Ay - Cy)) )
 
-        v = ( ((Cy - Ay)*(Px - Cx) + (Ax - Cx)*(Py - Cy) ) /
-              ((By - Cy)*(Ax - Cx) + (Cx - Bx)*(Ay - Cy)) )
+def barycentric(A, B, C, P):
+    bc = cross(
+        (B[0] - A[0], C[0] - A[0], A[0] - P[0]), 
+        (B[1] - A[1], C[1] - A[1], A[1] - P[1])
+    )
 
-        w = 1 - u - v
-    except:
+    if abs(bc[2]) < 1:
         return -1, -1, -1
 
-    return u, v, w
+    u = bc[0]/bc[2]
+    v = bc[1]/bc[2]
+    w = 1 - (bc[0] + bc[1])/bc[2]
+
+    return w, v, u

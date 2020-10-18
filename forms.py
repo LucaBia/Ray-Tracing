@@ -2,7 +2,7 @@ from gl import color
 from mathLib import * 
 from numpy import arccos, arctan2
 
-from math import sqrt, inf
+from math import sqrt, inf # Utilizadas unicamente para el cilindro
 
 
 OPAQUE = 0
@@ -275,3 +275,68 @@ class Cylinder(object):
                              sceneObject = self)
 
         return None
+        
+
+class Triangle(object):
+
+    def __init__(self, vertices, material):
+        self.vertices = vertices
+        self.material = material
+
+    def ray_intersect(self, origin, direction):
+        v0, v1, v2 = self.vertices
+        normal = cross(subVectors(v1, v0), subVectors(v2, v0))
+        determinant = dotVectors(normal, direction)
+
+        if abs(determinant) < 0.0001:
+            return None
+
+        distance = dotVectors(normal, v0)
+        t = (dotVectors(normal, origin) + distance) / determinant
+        if t < 0:
+            return None
+
+        point = sumVectors(origin, multiply(t, direction))
+        u, v, w = barycentric(v0, v1, v2, point)
+
+        if w < 0 or v < 0 or u < 0:
+            return None
+        
+        return Intersect(distance = distance,
+                         point = point,
+                         normal = frobeniusNorm(normal),
+                         texCoords = None,
+                         sceneObject = self)
+
+
+class Pyramid(object):
+
+    def __init__(self, vertices, material):
+        self.sides = self.generate_sides(vertices, material)
+        self.material = material
+
+    def generate_sides(self, vertices, material):
+        if len(vertices) != 4:
+            return [None, None, None, None]
+
+        v0, v1, v2, v3 = vertices
+        sides = [
+            Triangle([v0, v3, v2], material),
+            Triangle([v0, v1, v2], material),
+            Triangle([v1, v3, v2], material),
+            Triangle([v0, v1, v3], material),
+        ]
+        return sides
+
+    def ray_intersect(self, origin, direction):
+        t = float("inf")
+        intersect = None
+
+        for triangle in self.sides:
+            local_intersect = triangle.ray_intersect(origin, direction)
+            if local_intersect is not None:
+                if local_intersect.distance < t:
+                    t = local_intersect.distance
+                    intersect = local_intersect
+
+        return intersect

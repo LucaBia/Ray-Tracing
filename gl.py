@@ -45,16 +45,16 @@ def refractVector(N, I, ior):
         cosi = -cosi
     else:
         etai, etat = etat, etai
-        N = N * -1
+        N = multiply(-1, N) 
 
     eta = etai/etat
     k = 1 - eta * eta * (1 - (cosi * cosi))
 
     if k < 0: 
         return None
-    
-    R = eta * I + (eta * cosi - k**0.5) * N
-    return R / frobeniusNorm(R)
+
+    R = sumVectors(multiply(eta, I), multiply((eta * cosi - k**0.5), N))
+    return divVN(R, frobeniusNorm(R))
 
 
 def fresnel(N, I, ior):
@@ -376,7 +376,6 @@ class Raytracer(object):
         elif material.matType == REFLECTIVE:
             # reflect = reflectVector(intersect.normal, direction * -1)
             reflect = reflectVector(intersect.normal, multiply(-1, direction))
-            print(recursion)
             reflectColor = self.castRay(intersect.point, reflect, intersect.sceneObject, recursion + 1)
             reflectColor = [reflectColor[2] / 255,
                             reflectColor[1] / 255,
@@ -388,10 +387,10 @@ class Raytracer(object):
         elif material.matType == TRANSPARENT:
 
             outside = dotVectors(direction, intersect.normal) < 0
-            bias = 0.001 * intersect.normal
+            bias = multiply(0.001, intersect.normal)
             kr = fresnel(intersect.normal, direction, material.ior)
 
-            reflect = reflectVector(intersect.normal, direction * -1)
+            reflect = reflectVector(intersect.normal, multiply(-1, direction))
             reflectOrig = sumVectors(intersect.point, bias) if outside else subVectors(intersect.point, bias)
             reflectColor = self.castRay(reflectOrig, reflect, None, recursion + 1)
             reflectColor = [reflectColor[2] / 255,
